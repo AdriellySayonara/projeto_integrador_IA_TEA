@@ -1,90 +1,272 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from .models import EEGFile, Analysis, ReportConfig
-# Importe aqui suas bibliotecas de análise (ex: mne, numpy, weka wrappers)
-import os
+# Funções utilitárias do Django para renderizar templates,
+# redirecionar requisições e obter objetos do banco com validação 404.
 
+from django.contrib.auth.decorators import login_required
+# Decorator que garante que apenas usuários autenticados
+# possam acessar as views protegidas.
+
+from django.contrib import messages
+# Framework de mensagens do Django, usado para exibir feedback
+# ao usuário (sucesso, erro, avisos).
+
+from .models import EEGFile, Analysis, ReportConfig
+# Importação dos modelos principais utilizados pelas views.
+
+import os
+# Utilizado para manipulação de caminhos e extensões de arquivos.
+
+import random
+# Utilizado temporariamente para simular o comportamento da IA
+# enquanto o WEKA via CSI não está integrado.
+
+
+# ============================================================
+# IMPORTANTE: Importar os decoradores de segurança personalizados
+# ============================================================
+from .decorators import can_upload, can_audit
+# Decoradores responsáveis por controlar permissões de acesso
+# com base no perfil do usuário (médico, auditor ou admin).
+
+
+# ============================================================
+# DASHBOARD PRINCIPAL
+# ============================================================
 @login_required
 def dashboard(request):
-    return render(request, 'dashboard.html')
+    # Obtém o perfil do usuário autenticado, se existir
+    profile = getattr(request.user, 'profile', None)
+    
+    # Auditor ou Admin têm visão global para monitoramento
+    if profile and (profile.is_auditor or profile.is_admin):
+        # Busca os 10 arquivos mais recentes de todo o sistema
+        files = EEGFile.objects.all().order_by('-uploaded_at')[:10]
 
+        # O modo 'audit' é usado no template para ajustar a interface
+        context = {'files': files, 'mode': 'audit'}
+    else:
+        # Médico visualiza apenas seus próprios arquivos
+        files = EEGFile.objects.filter(user=request.user).order_by('-uploaded_at')[:10]
+
+        # O modo 'doctor' limita funcionalidades no template
+        context = {'files': files, 'mode': 'doctor'}
+        
+    # Renderiza o dashboard com contexto dinâmico por perfil
+    return render(request, 'dashboard.html', context)
+
+
+# ============================================================
+# UPLOAD DE ARQUIVOS (ZONA DE PERIGO)
+# Acesso restrito a Médico e Admin
+# ============================================================
 @login_required
+@can_upload 
 def upload_file(request):
+    # Verifica se a requisição é POST e se existe arquivo enviado
     if request.method == 'POST' and request.FILES.get('file'):
         uploaded_file = request.FILES['file']
-        # Validação simples de extensão
+
+        # Extrai e normaliza a extensão do arquivo
         ext = os.path.splitext(uploaded_file.name)[1].lower()
+
+        # Validação simples de formato permitido
         if ext not in ['.gdf', '.dta']:
             messages.error(request, "Formato inválido. Use .gdf ou .dta")
             return redirect('upload_file')
             
+        # Cria o registro do arquivo EEG no banco
         eeg = EEGFile.objects.create(
             user=request.user,
             file=uploaded_file,
             original_name=uploaded_file.name,
-            size_bytes=uploaded_file.size
+            size_bytes=uploaded_file.size,
+            status='pending'  # Status inicial do processamento
         )
+
+        # Feedback visual para o usuário
         messages.success(request, "Arquivo enviado com sucesso!")
+
+        # Redireciona para a tela de solicitação de análise
         return redirect('request_analysis')
+
+    # Caso GET, apenas renderiza o formulário de upload
     return render(request, 'upload.html')
 
+
+# ============================================================
+# SOLICITAÇÃO DE ANÁLISE
+# ============================================================
 @login_required
+@can_upload
 def request_analysis(request):
-    # Lista arquivos que ainda NÃO foram analisados
-    user_files = EEGFile.objects.filter(user=request.user, analysis__isnull=True).order_by('-uploaded_at')
+    # Lista apenas arquivos do usuário que ainda não possuem análise
+    # Evita duplicidade de processamento
+    user_files = EEGFile.objects.filter(
+        user=request.user,
+        analysis__isnull=True
+    ).order_by('-uploaded_at')
+
+    # Renderiza a tela de solicitação de análise
     return render(request, 'request_analysis.html', {'user_files': user_files})
 
+
+# ============================================================
+# EXECUÇÃO DA ANÁLISE (SIMULADA)
+# ============================================================
 @login_required
+@can_upload
 def analyze_file(request, file_id):
-    eeg_file = get_object_or_404(EEGFile, id=file_id, user=request.user)
+    # Obtém o arquivo pelo ID ou retorna 404 se não existir
+    eeg_file = get_object_or_404(EEGFile, id=file_id)
     
-    # --- AQUI ENTRARIA SUA LÓGICA DE IA/PYTHON/WEKA ---
-    # Simulando um resultado para o sistema não quebrar:
-    import random
+    # Camada extra de segurança:
+    # impede que médicos analisem arquivos de outros usuários
+    if eeg_file.user != request.user and not request.user.profile.is_admin:
+         messages.error(request, "Você não tem permissão para analisar este arquivo.")
+         return redirect('dashboard')
+
+    # --------------------------------------------------------
+    # SIMULAÇÃO DA IA (TEMPORÁRIA)
+    # --------------------------------------------------------
+    # A classificação e a confiança são geradas aleatoriamente
+    # enquanto a integração com o WEKA via CSI não existe.
     classification = random.choice([True, False]) 
     confidence = random.uniform(50, 99)
-    # ---------------------------------------------------
+    # --------------------------------------------------------
 
+    # Cria o registro da análise no banco
     analysis = Analysis.objects.create(
         eeg_file=eeg_file,
         classification=classification,
         confidence=confidence
     )
     
+    # Atualiza o status do arquivo após a análise
+    eeg_file.status = 'completed'
+    eeg_file.save()
+    
+    # Feedback de sucesso
     messages.success(request, "Análise concluída.")
+
+    # Redireciona para a visualização do resultado
     return redirect('result_view', analysis_id=analysis.id)
 
+
+# ============================================================
+# VISUALIZAÇÃO DO RESULTADO DA ANÁLISE
+# ============================================================
 @login_required
 def result_view(request, analysis_id):
-    analysis = get_object_or_404(Analysis, eeg_file__user=request.user, id=analysis_id)
+    # Obtém o perfil do usuário autenticado
+    profile = request.user.profile
+    
+    # Auditor e Admin podem visualizar qualquer análise
+    if profile.is_auditor or profile.is_admin:
+        analysis = get_object_or_404(Analysis, id=analysis_id)
+    else:
+        # Médico só pode visualizar análises dos seus próprios arquivos
+        analysis = get_object_or_404(
+            Analysis,
+            eeg_file__user=request.user,
+            id=analysis_id
+        )
+        
+    # Renderiza o resultado da análise
     return render(request, 'result.html', {'analysis': analysis})
 
+
+# ============================================================
+# HISTÓRICO / AUDITORIA DE LAUDOS
+# ============================================================
 @login_required
 def report_history(request):
-    analyses = Analysis.objects.filter(eeg_file__user=request.user).order_by('-analyzed_at')
-    return render(request, 'history.html', {'analyses': analyses})
+    profile = request.user.profile
+    
+    # Auditor/Admin possuem visão global do sistema
+    if profile.is_auditor or profile.is_admin:
+        analyses = Analysis.objects.all().order_by('-analyzed_at')
+        title = "Auditoria Global de Laudos"
+    else:
+        # Médico visualiza apenas seus próprios laudos
+        analyses = Analysis.objects.filter(
+            eeg_file__user=request.user
+        ).order_by('-analyzed_at')
+        title = "Meus Laudos"
+        
+    # Renderiza a tela de histórico com título dinâmico
+    return render(
+        request,
+        'history.html',
+        {'analyses': analyses, 'page_title': title}
+    )
 
+
+# ============================================================
+# CONFIGURAÇÕES DE RELATÓRIO
+# ============================================================
 @login_required
 def report_settings(request):
+    # Obtém ou cria configuração individual para o usuário
     config, created = ReportConfig.objects.get_or_create(user=request.user)
+
+    # Atualiza configurações caso a requisição seja POST
     if request.method == 'POST':
         config.format = request.POST.get('format')
         config.frequency = request.POST.get('frequency')
         config.save()
         messages.success(request, "Configurações salvas.")
+
+    # Renderiza a tela de configurações
     return render(request, 'report_settings.html', {'config': config})
 
+
+# ============================================================
+# PRÉ-VISUALIZAÇÃO DE RELATÓRIO
+# ============================================================
 @login_required
 def report_preview(request, analysis_id):
-    # Renderiza a página que contém o iframe do PDF
-    analysis = get_object_or_404(Analysis, eeg_file__user=request.user, id=analysis_id)
-    return render(request, 'report_preview.html', {'analysis_id': analysis.id})
+    # Mesma regra de acesso do result_view
+    profile = request.user.profile
 
+    if profile.is_auditor or profile.is_admin:
+        analysis = get_object_or_404(Analysis, id=analysis_id)
+    else:
+        analysis = get_object_or_404(
+            Analysis,
+            eeg_file__user=request.user,
+            id=analysis_id
+        )
+        
+    # Renderiza a pré-visualização do relatório
+    return render(
+        request,
+        'report_preview.html',
+        {'analysis_id': analysis.id}
+    )
+
+
+# ============================================================
+# GERAÇÃO / DOWNLOAD DE PDF
+# ============================================================
 @login_required
 def report_pdf(request, analysis_id):
-    # Placeholder para geração do PDF real
-    # Você precisaria usar WeasyPrint ou ReportLab aqui
     from django.http import HttpResponse
-    return HttpResponse("PDF gerado (Mock)", content_type='application/pdf')
+    # Importação local do HttpResponse para retorno direto do PDF
 
+    # Auditor/Admin podem gerar PDF de qualquer análise
+    profile = request.user.profile
+
+    if profile.is_auditor or profile.is_admin:
+        analysis = get_object_or_404(Analysis, id=analysis_id)
+    else:
+        analysis = get_object_or_404(
+            Analysis,
+            eeg_file__user=request.user,
+            id=analysis_id
+        )
+        
+    # Retorno simulado do PDF (placeholder)
+    return HttpResponse(
+        f"PDF do exame {analysis.eeg_file.original_name}",
+        content_type='application/pdf'
+    )

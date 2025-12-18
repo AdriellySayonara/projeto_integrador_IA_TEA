@@ -10,13 +10,13 @@
                     <i class="bi bi-speedometer2 me-3"></i>
                     Painel de Controle
                 </h1>
-                <p class="lead text-muted mb-0">
+                <p class="lead text mb-0">
                     Bem-vindo(a) de volta, <span class="text-dark fw-semibold">{{ user.get_full_name|default:user.username }}</span>!
                 </p>
-                <p class="text-muted">
+                <p class="text">
                     <small>
                         <i class="bi bi-calendar-check me-1"></i>
-                        Acesso em: {% now "d/m/Y H:i" %}
+                        Acesso em: {% now "d/m/Y H:i" %} 
                     </small>
                 </p>
             </div>
@@ -294,7 +294,7 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td>{{ upload.upload_date|date:"d/m/Y" }}</td>
+                                    <td>{{ file.uploaded_at|date:"d/m/Y H:i" }}</td>
                                     <td>
                                         {% if upload.status == 'completed' %}
                                         <span class="badge bg-success-subtle text-success">
