@@ -1,0 +1,353 @@
+<!-- templates/registration/register.html -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - Sistema MONAN</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .modern-card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            background: white;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 2rem;
+        }
+        
+        .btn-modern {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: transform 0.3s ease;
+        }
+        
+        .btn-modern:hover {
+            transform: translateY(-2px);
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .form-control:focus {
+            border-color: #764ba2;
+            box-shadow: 0 0 0 0.25rem rgba(118, 75, 162, 0.25);
+        }
+        
+        .input-group-text {
+            background-color: #f8f9fa;
+            border-right: none;
+        }
+        
+        .input-group .form-control {
+            border-left: none;
+        }
+        
+        .password-strength {
+            height: 5px;
+            margin-top: 5px;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+        
+        .strength-weak { background-color: #dc3545; width: 25%; }
+        .strength-fair { background-color: #ffc107; width: 50%; }
+        .strength-good { background-color: #28a745; width: 75%; }
+        .strength-strong { background-color: #20c997; width: 100%; }
+        
+        .feature-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .login-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .login-link:hover {
+            text-decoration: underline;
+        }
+        
+        .alert-modern {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="modern-card">
+                    <div class="card-header text-white text-center">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 text-center">
+                                <div class="display-1">
+                                    <i class="bi bi-clipboard-pulse"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-10">
+                                <h1 class="display-6 fw-bold mb-3">
+                                    <i class="bi bi-person-plus-fill me-2"></i>
+                                    Cadastro - Sistema MONAN
+                                </h1>
+                                <p class="lead mb-0 opacity-90">
+                                    Preencha os dados abaixo para solicitar acesso ao sistema especializado em diagnóstico do TEA
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+<div class="card-body p-4 p-md-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8 col-xl-6"> <!-- Coluna centralizada com largura controlada -->
+            <div class="text-center mb-5">
+                <div class="display-4 text-primary opacity-25 mb-3">
+                    <i class="bi bi-person-plus-fill"></i>
+                </div>
+                <h2 class="mb-3">
+                    <i class="bi bi-person-vcard text-primary me-2"></i>
+                    Cadastro - Sistema MONAN
+                </h2>
+                <p class="lead text-muted">
+                    Preencha os dados abaixo para solicitar acesso ao sistema
+                </p>
+            </div>
+            
+            <!-- MENSAGENS -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-modern alert-dismissible fade show" role="alert">
+                        {% if message.tags == 'success' %}
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                        {% elif message.tags == 'error' or message.tags == 'danger' %}
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        {% elif message.tags == 'warning' %}
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        {% else %}
+                            <i class="bi bi-info-circle-fill me-2"></i>
+                        {% endif %}
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <form method="post" id="registrationForm" class="needs-validation" novalidate>
+                {% csrf_token %}
+                
+                <!-- Nome de Usuário e Email -->
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <label for="id_username" class="form-label fw-semibold">
+                            <i class="bi bi-person me-1"></i>
+                            Nome de Usuário *
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-person-fill"></i>
+                            </span>
+                            <input type="text" name="username" id="id_username" class="form-control" placeholder="Escolha um nome de usuário" required>
+                        </div>
+                        <div class="form-text small">Mínimo 3 caracteres</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="id_email" class="form-label fw-semibold">
+                            <i class="bi bi-envelope me-1"></i>
+                            E-mail *
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-at"></i>
+                            </span>
+                            <input type="email" name="email" id="id_email" class="form-control" placeholder="seu@email.com" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Senha -->
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <label for="id_password1" class="form-label fw-semibold">
+                            <i class="bi bi-lock me-1"></i>
+                            Senha *
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-key-fill"></i>
+                            </span>
+                            <input type="password" name="password1" id="id_password1" class="form-control" placeholder="Crie uma senha segura" required>
+                            <button class="btn btn-outline-secondary toggle-password" type="button" data-target="id_password1">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                        <div id="passwordStrength" class="password-strength mt-2"></div>
+                        <div class="form-text small">Mínimo 8 caracteres</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="id_password2" class="form-label fw-semibold">
+                            <i class="bi bi-lock-fill me-1"></i>
+                            Confirmar Senha *
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-key"></i>
+                            </span>
+                            <input type="password" name="password2" id="id_password2" class="form-control" placeholder="Confirme sua senha" required>
+                            <button class="btn btn-outline-secondary toggle-password" type="button" data-target="id_password2">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Nome e Sobrenome -->
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <label for="id_first_name" class="form-label fw-semibold">
+                            <i class="bi bi-person me-1"></i>
+                            Nome
+                        </label>
+                        <input type="text" name="first_name" id="id_first_name" class="form-control" placeholder="Seu nome">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="id_last_name" class="form-label fw-semibold">
+                            Sobrenome
+                        </label>
+                        <input type="text" name="last_name" id="id_last_name" class="form-control" placeholder="Seu sobrenome">
+                    </div>
+                </div>
+                
+                <!-- Termos e Condições -->
+                <div class="mb-4 form-check">
+                    <input type="checkbox" class="form-check-input" id="terms" required>
+                    <label class="form-check-label" for="terms">
+                        Eu concordo com os 
+                        <a href="#" class="text-decoration-none">Termos de Uso</a> e 
+                        <a href="#" class="text-decoration-none">Política de Privacidade</a> *
+                    </label>
+                    <div class="invalid-feedback">
+                        Você deve concordar com os termos.
+                    </div>
+                </div>
+                
+                <!-- Botões -->
+                <div class="d-grid gap-3 mb-4">
+                    <button type="submit" class="btn btn-modern btn-lg py-3">
+                        <i class="bi bi-person-plus me-2"></i>
+                        Solicitar Cadastro
+                    </button>
+                    
+                    <a href="{% url 'login' %}" class="btn btn-outline-primary btn-lg py-3">
+                        <i class="bi bi-arrow-left me-2"></i>
+                        Voltar para Login
+                    </a>
+                </div>
+                
+                <!-- Informações -->
+                <div class="text-center mt-4 pt-3 border-top">
+                    <p class="text-muted mb-0">
+                        <small>
+                            <i class="bi bi-info-circle me-1"></i>
+                            Após o cadastro, seu acesso será analisado pelo administrador.
+                        </small>
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Toggle password visibility
+        document.querySelectorAll('.toggle-password').forEach(button => {
+            button.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const passwordField = document.getElementById(targetId);
+                const icon = this.querySelector('i');
+                
+                if (passwordField.type === 'password') {
+                    passwordField.type = 'text';
+                    icon.classList.remove('bi-eye');
+                    icon.classList.add('bi-eye-slash');
+                } else {
+                    passwordField.type = 'password';
+                    icon.classList.remove('bi-eye-slash');
+                    icon.classList.add('bi-eye');
+                }
+            });
+        });
+        
+        // Password strength indicator
+        const passwordField = document.getElementById('id_password1');
+        const strengthBar = document.getElementById('passwordStrength');
+        
+        if (passwordField && strengthBar) {
+            passwordField.addEventListener('input', function() {
+                const password = this.value;
+                let strength = 0;
+                
+                if (password.length >= 8) strength++;
+                if (/[a-z]/.test(password)) strength++;
+                if (/[A-Z]/.test(password)) strength++;
+                if (/[0-9]/.test(password)) strength++;
+                if (/[^A-Za-z0-9]/.test(password)) strength++;
+                
+                strengthBar.className = 'password-strength';
+                
+                if (strength <= 2) {
+                    strengthBar.classList.add('strength-weak');
+                } else if (strength === 3) {
+                    strengthBar.classList.add('strength-fair');
+                } else if (strength === 4) {
+                    strengthBar.classList.add('strength-good');
+                } else if (strength >= 5) {
+                    strengthBar.classList.add('strength-strong');
+                }
+            });
+        }
+        
+        // Form validation
+        (function() {
+            'use strict';
+            var forms = document.querySelectorAll('.needs-validation');
+            Array.prototype.slice.call(forms).forEach(function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+    </script>
+</body>
+</html>

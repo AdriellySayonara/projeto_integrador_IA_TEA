@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Sistema MONAN{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-stretch min-vh-80"> <!-- alterado para align-items-stretch -->
+  <!-- Card de Login -->
+  <div class="col-md-6 col-lg-5 d-flex"> <!-- adicionado d-flex -->
+    <div class="modern-card flex-fill"> <!-- adicionado flex-fill -->
+      <div class="card-header text-center py-4">
+        <h3 class="mb-0">
+          <i class="bi bi-person-circle me-2"></i>
+          Acessar Sistema
+        </h3>
+        <p class="mt-2 mb-0 opacity-75">Entre com suas credenciais</p>
+      </div>
+      
+      <div class="card-body p-4 p-md-5">
+        {% if form.errors %}
+        <div class="alert alert-danger alert-modern mb-4">
+          <i class="bi bi-exclamation-octagon-fill me-2"></i>
+          Usuário ou senha incorretos. Tente novamente.
+        </div>
+        {% endif %}
+        
+        {% if next %}
+          {% if user.is_authenticated %}
+          <div class="alert alert-warning alert-modern mb-4">
+            <i class="bi bi-shield-lock me-2"></i>
+            Sua conta não tem acesso a esta página.
+          </div>
+          {% else %}
+          <div class="alert alert-info alert-modern mb-4">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            Por favor, faça login para acessar esta página.
+          </div>
+          {% endif %}
+        {% endif %}
+        
+        <form method="post" action="{% url 'login' %}" class="needs-validation" novalidate>
+          {% csrf_token %}
+          
+          <div class="mb-4">
+            <label for="id_username" class="form-label fw-semibold">
+              <i class="bi bi-person-badge me-1"></i>
+              Nome de usuário
+            </label>
+            <div class="input-group">
+              <span class="input-group-text bg-light">
+                <i class="bi bi-person"></i>
+              </span>
+              <input type="text" 
+                     name="username" 
+                     id="id_username" 
+                     class="form-control form-control-lg" 
+                     placeholder="Digite seu usuário"
+                     required
+                     autofocus>
+              <div class="invalid-feedback">
+                Por favor, informe seu nome de usuário.
+              </div>
+            </div>
+          </div>
+          
+          <div class="mb-4">
+            <label for="id_password" class="form-label fw-semibold">
+              <i class="bi bi-key me-1"></i>
+              Senha
+            </label>
+            <div class="input-group">
+              <span class="input-group-text bg-light">
+                <i class="bi bi-lock"></i>
+              </span>
+              <input type="password" 
+                     name="password" 
+                     id="id_password" 
+                     class="form-control form-control-lg" 
+                     placeholder="Digite sua senha"
+                     required>
+              <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                <i class="bi bi-eye"></i>
+              </button>
+              <div class="invalid-feedback">
+                Por favor, informe sua senha.
+              </div>
+            </div>
+          </div>
+          
+          <div class="mb-4 form-check">
+            <input type="checkbox" class="form-check-input" id="rememberMe">
+            <label class="form-check-label" for="rememberMe">
+              Manter-me conectado
+            </label>
+          </div>
+          
+          <div class="d-grid gap-3 mb-4">
+            <button type="submit" class="btn btn-modern btn-lg">
+              <i class="bi bi-box-arrow-in-right me-2"></i>
+              Entrar
+            </button>
+            
+            <input type="hidden" name="next" value="{{ next }}">
+            
+            <a href="{% url 'password_reset' %}" class="btn btn-outline-primary btn-lg">
+              <i class="bi bi-question-circle me-2"></i>
+              Esqueci minha senha
+            </a>
+          </div>
+          
+          <div class="text-center pt-3 border-top">
+            <p class="mb-0 text-muted">
+              Novo no sistema?
+              <a href="{% url 'register' %}" class="text-decoration-none fw-semibold ms-1">
+                Solicite acesso
+              </a>
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Card de Informações -->
+  <div class="col-md-6 col-lg-5 d-flex"> <!-- removido d-none d-md-block, adicionado d-flex -->
+    <div class="modern-card flex-fill h-100 d-flex flex-column"> <!-- adicionado flex-fill, h-100 e flex-column -->
+      <div class="card-header bg-success-gradient text-white">
+        <h3 class="mb-0">
+          <i class="bi bi-clipboard-pulse me-2"></i>
+          Sistema MONAN
+        </h3>
+      </div>
+      <div class="card-body p-4 p-md-5 flex-fill d-flex flex-column"> <!-- ajustado padding e adicionado flex classes -->
+        <div class="text-center mb-4 flex-fill d-flex flex-column justify-content-center"> <!-- ajustado margin e adicionado flex -->
+          <div class="display-4 text-primary opacity-25 mb-3"> <!-- alterado display-1 para display-4 -->
+            <span class="material-symbols-outlined" style="color: #2774e0ff; font-size: 100px">neurology</span>
+          </div>
+          <h3 class="mb-3">Bem-vindo de volta!</h3> <!-- alterado h2 para h3 -->
+          <p class="text-muted"> <!-- removido lead -->
+            Ferramenta especializada para auxiliar profissionais no diagnóstico do Transtorno do Espectro Autista.
+          </p>
+        </div>
+        
+        
+            <h5 class="d-flex align-items-center mb-3"> <!-- adicionado mb-3 -->
+              <i class="bi bi-info-circle-fill text-primary me-2"></i>
+              Sobre o Sistema
+            </h5>
+            <ul class="list-unstyled mb-0">
+              <li class="mb-2">
+                <i class="bi bi-check-circle text-success me-2"></i>
+                Apoio ao diagnóstico do Transtorno do Espectro Autista
+              </li>
+              <li class="mb-2">
+                <i class="bi bi-check-circle text-success me-2"></i>
+                Ambiente seguro e confidencial
+              </li>
+              <li class="mb-2"> <!-- adicionado mb-2 -->
+                <i class="bi bi-check-circle text-success me-2"></i>
+                Suporte a múltiplos profissionais
+              </li>
+              <li>
+                <i class="bi bi-check-circle text-success me-2"></i>
+                Sistema desenvolvido em conformidade com diretrizes éticas
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+<!-- Adicione este CSS para garantir alinhamento perfeito -->
+<style>
+.modern-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.card-body {
+  flex: 1 1 auto;
+}
+
+@media (max-width: 768px) {
+  .col-md-6 {
+    margin-bottom: 1.5rem;
+  }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Mostrar/ocultar senha
+  document.getElementById('togglePassword').addEventListener('click', function() {
+    const passwordInput = document.getElementById('id_password');
+    const icon = this.querySelector('i');
+    
+    if (passwordInput.type === 'password') {
+      passwordInput.type = 'text';
+      icon.className = 'bi bi-eye-slash';
+    } else {
+      passwordInput.type = 'password';
+      icon.className = 'bi bi-eye';
+    }
+  });
+  
+  // Validação de formulário
+  (function() {
+    'use strict';
+    const forms = document.querySelectorAll('.needs-validation');
+    
+    Array.from(forms).forEach(function(form) {
+      form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  })();
+  
+  // Foco no campo de usuário ao carregar
+  document.addEventListener('DOMContentLoaded', function() {
+    const usernameField = document.getElementById('id_username');
+    if (usernameField && !usernameField.value) {
+      usernameField.focus();
+    }
+  });
+</script>
+{% endblock %}

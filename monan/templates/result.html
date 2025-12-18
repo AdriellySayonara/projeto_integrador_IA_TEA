@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Resultado da Análise</h2>
+
+<div class="ethical-warning alert alert-warning">
+  <strong><i class="bi bi-exclamation-triangle me-2"></i>Este resultado é um apoio técnico baseado em dados de EEG.</strong><br>
+  Não constitui diagnóstico médico. Recomenda-se avaliação por profissional de saúde qualificado.
+</div>
+
+<div class="card mt-4">
+  <div class="card-header bg-light">
+    <h5 class="mb-0">
+      <i class="bi bi-file-earmark-medical me-2"></i>
+      Informações da Análise
+    </h5>
+  </div>
+  <div class="card-body">
+    <!-- Informações fixas/simuladas - sem lógica de resultado -->
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <p><strong><i class="bi bi-file-earmark me-2"></i>Arquivo analisado:</strong><br>
+        EEG_Exemplo_Paciente.gdf</p>
+      </div>
+      <div class="col-md-6">
+        <p><strong><i class="bi bi-calendar me-2"></i>Data da análise:</strong><br>
+        {% now "d/m/Y H:i" %}</p>
+      </div>
+    </div>
+    
+    <!-- Resultado SIMULADO (placeholder) -->
+    <div class="alert alert-info">
+      <h5 class="alert-heading">
+        <i class="bi bi-gear me-2"></i>
+        Funcionalidade em Desenvolvimento
+      </h5>
+      <p class="mb-0">
+        A integração com o sistema WEKA/CSI para análise automatizada de EEG está em desenvolvimento.<br>
+        <strong>Em breve você poderá visualizar resultados reais aqui.</strong>
+      </p>
+    </div>
+    
+    <!-- Placeholders para os resultados futuros -->
+    <div class="row mt-4">
+      <div class="col-md-6">
+        <div class="card border">
+          <div class="card-body text-center">
+            <i class="bi bi-clipboard-check display-4 text-muted opacity-50 mb-3"></i>
+            <h6>Resultado da Análise</h6>
+            <p class="text-muted small">Disponível após implementação do WEKA</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-6">
+        <div class="card border">
+          <div class="card-body text-center">
+            <i class="bi bi-percent display-4 text-muted opacity-50 mb-3"></i>
+            <h6>Nível de Confiança</h6>
+            <p class="text-muted small">Será calculado pelo modelo</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Ações disponíveis -->
+    <div class="mt-4 pt-3 border-top">
+      <div class="d-flex flex-wrap gap-2">
+        <button class="btn btn-primary" disabled title="Disponível após WEKA">
+          <i class="bi bi-file-earmark-pdf me-2"></i>
+          Gerar Laudo (em breve)
+        </button>
+        
+        <a href="{% url 'report_history' %}" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left me-2"></i>
+          Voltar ao Histórico
+        </a>
+        
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-primary">
+          <i class="bi bi-speedometer2 me-2"></i>
+          Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Informação sobre o desenvolvimento -->
+<div class="card mt-4 border-info">
+  <div class="card-header bg-info-subtle">
+    <h6 class="mb-0">
+      <i class="bi bi-info-circle-fill me-2"></i>
+      Status do Desenvolvimento
+    </h6>
+  </div>
+ <!-- <div class="card-body">
+    <p class="mb-2">
+      <strong>Funcionalidades em desenvolvimento pela equipe:</strong>
+    </p>
+    <ul class="mb-0">
+      <li>✅ <strong>Concluído:</strong> Interface do sistema e autenticação</li>
+      <li>🔄 <strong>Em andamento:</strong> Upload e validação de arquivos EEG</li>
+      <li>⏳ <strong>Próxima etapa:</strong> Integração com WEKA/CSI para análise</li>
+      <li>📋 <strong>Futuro:</strong> Geração automatizada de laudos em PDF</li>
+    </ul>
+  </div>
+</div>-->
+
+<style>
+.ethical-warning {
+  border-left: 4px solid #ffc107;
+  padding: 1rem;
+  background-color: #fff3cd;
+  border-radius: 4px;
+}
+
+.card {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.alert-info {
+  border-radius: 10px;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.bg-info-subtle {
+  background-color: rgba(23, 162, 184, 0.1) !important;
+}
+</style>
+{% endblock %}

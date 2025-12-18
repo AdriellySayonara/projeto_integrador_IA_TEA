@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Configurações de Relatório</h2>
+
+<form method="post">
+  {% csrf_token %}
+  <div class="card mt-3">
+    <div class="card-body">
+      <div class="mb-3">
+        <label class="form-label">Formato do relatório</label>
+        <select name="format" class="form-select">
+          <option value="pdf" {% if config.format == 'pdf' %}selected{% endif %}>PDF</option>
+          <option value="html" {% if config.format == 'html' %}selected{% endif %}>HTML</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Frequência de geração</label>
+        <select name="frequency" class="form-select">
+          <option value="on_demand" {% if config.frequency == 'on_demand' %}selected{% endif %}>Sob demanda</option>
+          <option value="daily" {% if config.frequency == 'daily' %}selected{% endif %}>Diária</option>
+          <option value="weekly" {% if config.frequency == 'weekly' %}selected{% endif %}>Semanal</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary">Salvar Configurações</button>
+    </div>
+  </div>
+</form>
+{% endblock %}

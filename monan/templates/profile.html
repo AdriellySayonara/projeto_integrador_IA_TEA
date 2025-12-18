@@ -1,0 +1,303 @@
+<!-- templates/profile.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <!-- Cabeçalho -->
+                <div class="card-header bg-white border-0 py-4">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h2 class="mb-0">
+                            <i class="bi bi-person-circle me-2"></i>
+                            Meu Perfil
+                        </h2>
+                        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-arrow-left me-1"></i>
+                            Voltar
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <!-- Informações do Usuário -->
+                    <div class="text-center mb-5">
+                        <div class="position-relative d-inline-block mb-3">
+                            <!-- Foto de Perfil -->
+                            <div class="profile-picture-wrapper">
+                                {% if user.profile.avatar %}
+                                    <img src="{{ user.profile.avatar.url }}" 
+                                         alt="Foto de perfil" 
+                                         class="profile-picture rounded-circle shadow"
+                                         id="profileImage">
+                                {% else %}
+                                    <div class="profile-picture-placeholder rounded-circle shadow d-flex align-items-center justify-content-center"
+                                         id="profileImage">
+                                        <i class="bi bi-person-fill display-4 text-muted"></i>
+                                    </div>
+                                {% endif %}
+                                
+                                <!-- Botão para alterar foto -->
+                                <button type="button" 
+                                        class="btn btn-primary btn-sm position-absolute bottom-0 end-0 rounded-circle"
+                                        style="width: 40px; height: 40px;"
+                                        onclick="document.getElementById('avatarInput').click()"
+                                        title="Alterar foto">
+                                    <i class="bi bi-camera-fill"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Input de arquivo oculto -->
+                            <form id="avatarForm" method="post" action="{% url 'update_avatar' %}" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <input type="file" 
+                                       id="avatarInput" 
+                                       name="avatar" 
+                                       accept="image/*" 
+                                       class="d-none"
+                                       onchange="document.getElementById('avatarForm').submit()">
+                            </form>
+                        </div>
+                        
+                        <h4 class="fw-bold mb-1">{{ user.get_full_name|default:user.username }}</h4>
+                        <p class="text-muted mb-0">{{ user.email|default:"Sem email cadastrado" }}</p>
+                        <p class="text-muted small">
+                            <i class="bi bi-person-badge me-1"></i>
+                            {{ user.username }}
+                        </p>
+                    </div>
+
+                    <!-- Formulário de Mudança de Senha -->
+                    <div class="card border mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">
+                                <i class="bi bi-key-fill me-2"></i>
+                                Alterar Senha
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            {% if messages %}
+                                {% for message in messages %}
+                                    {% if 'password' in message.tags or message.tags == 'success' or message.tags == 'error' %}
+                                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                        {% if message.tags == 'success' %}
+                                            <i class="bi bi-check-circle-fill me-2"></i>
+                                        {% else %}
+                                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                        {% endif %}
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    </div>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                            
+                            <form method="post" action="{% url 'change_password' %}">
+                                {% csrf_token %}
+                                
+                                <div class="mb-3">
+                                    <label for="current_password" class="form-label">
+                                        <i class="bi bi-lock me-1"></i>
+                                        Senha Atual
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="password" 
+                                               class="form-control" 
+                                               id="current_password" 
+                                               name="current_password" 
+                                               required>
+                                        <button class="btn btn-outline-secondary toggle-password" 
+                                                type="button" 
+                                                data-target="current_password">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="new_password1" class="form-label">
+                                        <i class="bi bi-key me-1"></i>
+                                        Nova Senha
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="password" 
+                                               class="form-control" 
+                                               id="new_password1" 
+                                               name="new_password1" 
+                                               required>
+                                        <button class="btn btn-outline-secondary toggle-password" 
+                                                type="button" 
+                                                data-target="new_password1">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                    <div class="form-text">
+                                        Mínimo 8 caracteres. Inclua letras e números.
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="new_password2" class="form-label">
+                                        <i class="bi bi-key-fill me-1"></i>
+                                        Confirmar Nova Senha
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="password" 
+                                               class="form-control" 
+                                               id="new_password2" 
+                                               name="new_password2" 
+                                               required>
+                                        <button class="btn btn-outline-secondary toggle-password" 
+                                                type="button" 
+                                                data-target="new_password2">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-check-circle me-2"></i>
+                                        Alterar Senha
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Informações da Conta -->
+                    <div class="card border">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">
+                                <i class="bi bi-info-circle-fill me-2"></i>
+                                Informações da Conta
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-3">
+                                    <strong><i class="bi bi-person me-2"></i>Usuário:</strong>
+                                    <span class="float-end">{{ user.username }}</span>
+                                </li>
+                                <li class="mb-3">
+                                    <strong><i class="bi bi-envelope me-2"></i>Email:</strong>
+                                    <span class="float-end">{{ user.email|default:"Não informado" }}</span>
+                                </li>
+                                <li class="mb-3">
+                                    <strong><i class="bi bi-calendar me-2"></i>Conta criada:</strong>
+                                    <span class="float-end">{{ user.date_joined|date:"d/m/Y" }}</span>
+                                </li>
+                                <li>
+                                    <strong><i class="bi bi-clock-history me-2"></i>Último login:</strong>
+                                    <span class="float-end">{{ user.last_login|date:"d/m/Y H:i"|default:"Nunca" }}</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Botões de Ação -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-house me-2"></i>
+                            Dashboard
+                        </a>
+                        
+                        <a href="{% url 'logout' %}" class="btn btn-outline-danger">
+                            <i class="bi bi-box-arrow-right me-2"></i>
+                            Sair
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.profile-picture-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.profile-picture, .profile-picture-placeholder {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border: 5px solid white;
+}
+
+.profile-picture-placeholder {
+    background-color: #f8f9fa;
+    border: 5px solid #e9ecef;
+}
+
+.toggle-password {
+    min-width: 45px;
+}
+
+.card {
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.card-header {
+    border-radius: 15px 15px 0 0 !important;
+}
+
+.list-unstyled li {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.list-unstyled li:last-child {
+    border-bottom: none;
+}
+</style>
+
+<script>
+// Toggle password visibility
+document.querySelectorAll('.toggle-password').forEach(button => {
+    button.addEventListener('click', function() {
+        const targetId = this.getAttribute('data-target');
+        const passwordField = document.getElementById(targetId);
+        const icon = this.querySelector('i');
+        
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            icon.classList.remove('bi-eye');
+            icon.classList.add('bi-eye-slash');
+        } else {
+            passwordField.type = 'password';
+            icon.classList.remove('bi-eye-slash');
+            icon.classList.add('bi-eye');
+        }
+    });
+});
+
+// Preview da imagem antes de enviar (opcional)
+document.getElementById('avatarInput')?.addEventListener('change', function(e) {
+    if (e.target.files && e.target.files[0]) {
+        const reader = new FileReader();
+        const profileImage = document.getElementById('profileImage');
+        
+        reader.onload = function(e) {
+            if (profileImage.tagName === 'IMG') {
+                profileImage.src = e.target.result;
+            } else {
+                // Se for placeholder, substitui por imagem
+                const newImg = document.createElement('img');
+                newImg.src = e.target.result;
+                newImg.alt = "Foto de perfil";
+                newImg.className = "profile-picture rounded-circle shadow";
+                newImg.id = "profileImage";
+                
+                profileImage.parentNode.replaceChild(newImg, profileImage);
+            }
+        }
+        
+        reader.readAsDataURL(e.target.files[0]);
+    }
+});
+</script>
+{% endblock %}

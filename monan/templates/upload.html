@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Enviar Arquivo EEG (GDF/DTA)</h2>
+
+<div class="card mt-3">
+  <div class="card-body">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label for="file" class="form-label">Selecione um arquivo (.gdf ou .dta)</label>
+        <input class="form-control" type="file" id="file" name="file" accept=".gdf,.dta" required>
+        <div class="form-text">Apenas arquivos nos formatos GDF ou DTA são aceitos.</div>
+      </div>
+      <button type="submit" class="btn btn-success">Enviar Arquivo</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

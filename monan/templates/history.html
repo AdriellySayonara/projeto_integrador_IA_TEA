@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1">
+                        <i class="bi bi-clock-history me-2"></i>
+                        Histórico de Análises
+                    </h2>
+                    <p class="text-muted mb-0">Registro de processamentos de EEG realizados</p>
+                </div>
+                <a href="{% url 'request_analysis' %}" class="btn btn-outline-primary" disabled title="Disponível após implementação do WEKA">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    Nova Análise
+                </a>
+            </div>
+
+            <!-- Informação sobre status do desenvolvimento -->
+            <div class="alert alert-info mb-4">
+                <div class="d-flex">
+                    <i class="bi bi-info-circle-fill fs-4 me-3 mt-1"></i>
+                    <div>
+                        <h5 class="alert-heading">Estrutura Pronta - Aguardando Dados</h5>
+                        <p class="mb-2">A interface do histórico está completamente implementada. Aguardando integração com o sistema WEKA/CSI.</p>
+                        <p class="mb-0 small">
+                            <strong>Status:</strong> Layout finalizado. Os dados serão carregados automaticamente quando o backend estiver completo.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabela com estrutura visível mas sem dados -->
+            <div class="card border">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="bi bi-table me-2"></i>
+                        Análises Realizadas
+                    </h5>
+                </div>
+                
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <!-- Cabeçalho da tabela (ESTRUTURA VISÍVEL) -->
+                            <thead class="table-light">
+                                <tr>
+                                    <th><i class="bi bi-file-earmark me-1"></i> Arquivo</th>
+                                    <th><i class="bi bi-calendar me-1"></i> Data</th>
+                                    <th><i class="bi bi-clipboard-check me-1"></i> Resultado</th>
+                                    <th><i class="bi bi-percent me-1"></i> Confiança</th>
+                                    <th><i class="bi bi-gear me-1"></i> Ações</th>
+                                </tr>
+                            </thead>
+                            
+                            <!-- Corpo da tabela VAZIO (sem linhas de dados) -->
+                            <tbody>
+                                <!-- Nenhuma linha aqui - espaço reservado para dados futuros -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Mensagem indicando que está vazio POR CONTA DO DESENVOLVIMENTO -->
+                    <div class="text-center py-5 border-top">
+                        <div class="mb-4">
+                            <!-- Ícone indicando estrutura pronta -->
+                            <div class="position-relative d-inline-block">
+                                <i class="bi bi-table display-1 text-muted opacity-50"></i>
+                                <div class="position-absolute top-0 start-100 translate-middle">
+                                    <span class="badge bg-success rounded-pill p-2">
+                                        <i class="bi bi-check-lg"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h4 class="text-info mb-3">
+                            <i class="bi bi-check-circle me-2"></i>
+                            Estrutura Implementada
+                        </h4>
+                        
+                        <p class="text-muted mb-4 mx-auto" style="max-width: 600px;">
+                            A tabela acima mostra a estrutura completa do histórico.<br>
+                            <strong>As linhas serão preenchidas automaticamente</strong> quando o sistema WEKA/CSI
+                            estiver em produção e análises forem realizadas.
+                        </p>
+                        
+
+                    </div>
+                </div>
+                
+                <!-- Rodapé da tabela (estrutura de paginação) -->
+                <div class="card-footer bg-white border-top">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="text-muted small">
+                            Mostrando <strong>0</strong> de <strong>0</strong> análises
+                        </div>
+                        <nav aria-label="Navegação de páginas">
+                            <ul class="pagination pagination-sm mb-0">
+                                <li class="page-item disabled">
+                                    <span class="page-link">Anterior</span>
+                                </li>
+                                <li class="page-item disabled">
+                                    <span class="page-link">1</span>
+                                </li>
+                                <li class="page-item disabled">
+                                    <span class="page-link">Próxima</span>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botões de navegação -->
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>
+                    Voltar ao Dashboard
+                </a>
+                
+                <div class="btn-group">
+                    <button class="btn btn-outline-primary" disabled title="Aguardando dados">
+                        <i class="bi bi-download me-2"></i>
+                        Exportar Histórico
+                    </button>
+                    <button class="btn btn-outline-danger" disabled title="Aguardando dados">
+                        <i class="bi bi-trash me-2"></i>
+                        Limpar Histórico
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.table th {
+    font-weight: 600;
+    border-top: none;
+    background-color: #f8f9fa;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.text-muted {
+    color: #6c757d !important;
+}
+
+.bg-light {
+    background-color: #f8f9fa !important;
+}
+
+.alert-info {
+    border-radius: 10px;
+    border-left: 4px solid #0dcaf0;
+}
+
+.border-dashed {
+    border: 2px dashed #dee2e6 !important;
+}
+
+.bg-light.bg-opacity-50 {
+    background-color: rgba(248, 249, 250, 0.5) !important;
+}
+
+.page-item.disabled .page-link {
+    color: #6c757d;
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+}
+</style>
+{% endblock %}
